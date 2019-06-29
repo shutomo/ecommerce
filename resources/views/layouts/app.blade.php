@@ -7,82 +7,110 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>presTIGE</title>
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- tinymce -->
+    <script src="https://cloud.tinymce.com/5/tinymce.min.js?apiKey=faql5ec8jbok3zrmm2eylqqfwetbimrgohdk7i1n2cyjyuth"></script>
+    <script>tinymce.init({ selector:'textarea' });</script>
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{asset('css/style.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css" integrity="sha384-i1LQnF23gykqWXg6jxC2ZbCbUMxyw5gLZY6UiUS98LYV5unm8GWmfkIS6jqJfb4E" crossorigin="anonymous">
+
+    <script src="{{asset('caorsel/jquery.min.js')}}"></script>
+    <script src="{{asset('caorsel/bootstrap.min.js')}}"></script>
+    <style type="text/css">
+        .checked {
+          color: orange;
+        }
+        .hide {
+          display: none !important;
+        }
+        .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100; /* Behind the navbar */
+        padding: 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        }
+        .sidebar-sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 48px; /* Height of navbar */
+        height: calc(100vh - 48px);
+        padding-top: .5rem;
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+        }
+        .sidebar .nav-link {
+        font-weight: 500;
+        color: #333;
+        }
+        .sidebar .nav-link .feather {
+        margin-right: 4px;
+        color: #999;
+        }
+        .sidebar .nav-link.active {
+        color: #007bff;
+        }
+        .sidebar .nav-link:hover .feather,
+        .sidebar .nav-link.active .feather {
+        color: inherit;
+        }
+        .sidebar-heading {
+        font-size: .75rem;
+        text-transform: uppercase;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-success navbar-dark">
+        <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                     <header class="masthead mb-auto">
-                
-                    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{{url('/')}}" style="font-family:'candara'">presTIGE</a>
-            
-                    </header>
+                <a class="navbar-brand" href="{{ (Auth::user()) ? url('/home') : url('/') }}">
+                    {{ config('app.name', 'Laravel') }}
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                    
+
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
                         @if (Auth::check())
-
-                                <!-- products -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-                                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Produk
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Product
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('admin.products.index')
-                                }}">Daftar Mobil</a>
-                                    <a class="dropdown-item" href="{{ route('admin.products.create')
-                                }}">Tambah</a>
+                                    <a class="dropdown-item" href="{{ route('admin.products.index')}}">List</a>
+                                    <a class="dropdown-item" href="{{ route('admin.products.create')}}">Tambah</a>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('cart') }}">
+                                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                    Carts
+                                    <span class="badge badge-pill badge-danger">{{ (null != (session('cart'))) ? count(session('cart')) : 0}}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Order
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('admin.orders.index')}}">List</a>
                                 </div>
                             </li>
                         @endif
-                                <!-- products -->
-
-                                <!-- order -->
-                                <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-                                role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Order
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('admin.orders.index')
-                                }}">Daftar Order</a>
-                                    <a class="dropdown-item" href="{{ route('carts.index')
-                                }}">Tambah</a>
-                                </div>
-                            </li>
-                            <!-- order -->
-
-                            <!-- carts -->
-                            <li class="nav-item">
-                                    <a href="{{ route('carts.index') }}" class="btn btn-dark btn-block">
-                                    @if (session('cart'))
-                                        <i class="fa fa-shopping-cart" aria-hidden="true"></i> Cart <span class="badge badge-pill badge-light">{{ count(session('cart')) }}</span>
-                                    @else
-                                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>Cart <span class="badge badge-pill badge-light">0</span>
-                                    @endif
-                                    </a>
-                            </li>
-                            <!-- carts -->
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -100,7 +128,7 @@
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    Halo, {{ Auth::user()->name }} <span class="caret"></span>
+                                    {{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -125,9 +153,5 @@
             @yield('content')
         </main>
     </div>
-
- <!-- Footer -->
- 
-
 </body>
 </html>

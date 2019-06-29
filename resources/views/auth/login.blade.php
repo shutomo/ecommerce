@@ -1,6 +1,70 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('content')
+<div class="limiter">
+    <div class="container-login100">
+        <div>
+            <form class="login100-form validate-form" method="POST" action="{{ route('login') }}">
+                @csrf
+                <span class="login100-form-title p-b-43">
+                    LOGIN MEMBERSHIP
+                    <hr>
+                </span>
+                
+                @if ($errors->has('email'))
+                    <strong style="color:red">{{ $errors->first('email') }}</strong>
+                @endif
+                
+                @if ($errors->has('password'))
+                    <strong style="color:red">{{ $errors->first('password') }}</strong>
+                @endif
+                <span class="label-input">Email</span>
+                <div class="border rounded validate-input" data-validate = "Valid email is required: ex:gmail@sulistiyo.com">
+                    <input id="email" type="email" {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email"  required autofocus>
+                </div>
+                
+                <span class="label">Password</span>
+                <div class="border rounded validate-input" data-validate="Password is required">
+                    
+                    <input id="password" type="password" {{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+
+                    
+                </div>
+                <br>
+                <div class="flex-sb-m w-full p-t-3 p-b-32">
+                    <div class="contact-form-checkbox">
+                        <input class="input-checkbox" type="checkbox" name="remember" id="ckb1"> Remember Me
+                    </div>
+
+                    <div>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}">
+                                {{ __('Forgot Your Password?') }}
+                            </a>
+                        @endif
+                    </div>
+                </div>
+        
+
+                <div class="container-login100-form-btn">
+                    <button class="login100-form-btn">
+                        Login
+                    </button>
+                </div>
+                <hr>
+                <a href="{{ route('register') }}">
+                    Doesn't have an account yet ?
+                </a>
+            </form>
+
+            <div class="login100-more" style="background-image: url('https://www.bahrainthisweek.com/wp-content/uploads/2018/07/Volvo-Art-3.jpg');">
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+<!-- old below -->
+<!-- 
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -70,4 +134,4 @@
         </div>
     </div>
 </div>
-@endsection
+ -->

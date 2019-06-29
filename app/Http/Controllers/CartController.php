@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Product;
 class CartController extends Controller
@@ -9,10 +11,34 @@ class CartController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    function __construct()
+    {
+        $this->viewPrefix = 'cart';
+        $this->route = "cart";
+        $this->title = ucfirst($this->viewPrefix).'s';
+        $this->menu = "Cart";
+    }
+
+    public function prefix($param = null)
+    {
+        $data['title'] = $this->title;
+        $data['menu'] = $this->menu;
+
+        if(isset($param)){
+            foreach ($param as $index => $value) {
+                $data[$index] = $value;
+            }
+        }
+
+        return $data;
+    }
+
     public function index()
     {
-      return view('carts.index');
+        return view($this->viewPrefix.'.index', $this->prefix());
     }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -20,40 +46,45 @@ class CartController extends Controller
      */
     public function add($id)
     {
+        $msg = false;
         $product = Product::find($id);
-        if(!$product){
-          abort(404);
-        }
+        if(!$product)
+            abort(404);
+
         $cart = session()->get('cart');
-        // if cart is empaty then thsi the first products
-      if(!$cart){
-          $cart = [
-                  $id => [
-                    "name"=>$product->name,
-                    "quantity"=>1,
-                    "price"=>$product->price,
-                    "image_url"=>$product->image_url
-                  ]
-          ];
-          session()->put('cart', $cart);
-          return redirect()->route('carts.index')->with('success', 'Product added toc art successfully !');
+
+        var_dump(isset($cart[$id]));
+
+        if(!$cart){
+            $cart = [
+                $id=> [
+                    "name" => $product->name,
+                    "qty" => 1,
+                    "price" => $product->price,
+                    "image_url" => $product->image_url,
+                ]
+            ];
+            session()->put('cart', $cart);
+            return redirect(route('cart'))->with('message', 'Product added to cart successfully!');
         }
-      //if cart no empty then check if this product exist then icnrement quantity
-      if(isset($cart[$id])){
-        $cart[$id]['quantity']++;
+
+        if(isset($cart[$id])){
+            $cart[$id]['qty']++;
+            session()->put('cart', $cart);
+            return redirect(route('cart'))->with('message', 'Product added to cart successfully!');
+        }
+
+        $cart[$id] = [
+            "name" => $product->name,
+            "qty" => 1,
+            "price" => $product->price,
+            "image_url" => $product->image_url,
+        ];
         session()->put('cart', $cart);
-        return redirect()->route('carts.index')->with('success', 'Product added to cart successfully !');
-      }
-      // uf uten not exist in cart then add to cart with quantity = 1
-      $cart[$id] = [
-        "name"=>$product->name,
-        "quantity"=>1,
-        "price"=>$product->price,
-        "image_url"=>$product->image_url
-      ];
-      session()->put('cart', $cart);
-      return redirect()->route('carts.index')->with('Product added to cart successfully !');
+        
+        return redirect(route('cart'))->with('message', 'Product added to cart successfully!');
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -62,8 +93,31 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // $message = [
+        //         'name.unique' => ucfirst($request->name).' sudah ada.',
+        //         'price.integer' => 'Harga harus diisi dengan angka',
+        //         'name.required'=> 'Kolom nama harus di isi ',
+        //         'price.required'=> 'Kolom harga harus di isi '
+        //     ];
+        // $validation = Validator::make($request->all(), 
+        //         [
+        //             'name'=>'required|max:255|unique:packets',
+        //             'price'=>'required|integer',
+        //         ], $message);
+        // if($validation->fails())
+        //     return redirect(route($this->route.'.create'))->withErrors($validation)->withInput();
+
+        $data = $this->model;
+        $data->name = $request->name;
+        $data->price = $request->price;
+        $data->term = $request->term;
+
+        if ($data->save())
+            return redirect(route($this->route));
+        else
+            return redirect(route($this->route.'.create'))->withErrors()->withInput();
     }
+
     /**
      * Display the specified resource.
      *
@@ -74,6 +128,7 @@ class CartController extends Controller
     {
         //
     }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -84,6 +139,7 @@ class CartController extends Controller
     {
         //
     }
+
     /**
      * Update the specified resource in storage.
      *
@@ -93,29 +149,59 @@ class CartController extends Controller
      */
     public function update(Request $request)
     {
-      if($request->id and $request->quantity){
+        $msg = false;
+        $product = Product::find($request->id);
+        if(!$product)
+            abort(404);
+
         $cart = session()->get('cart');
-        $cart[$request->id]["quantity"] = $request->quantity;
-        session()->put('cart', $cart);
-        session()->flash('success', 'Cart update successfully !');
-      }
+
+        // if(!$cart){
+        //     $cart = [
+        //         $id=> [
+        //             "name" => $product->name,
+        //             "qty" => $request->qty,
+        //             "price" => $product->price,
+        //             "image_url" => $product->image_url,
+        //         ]
+        //     ];
+        //     $msg = true;
+        // }
+
+        if(isset($cart[$request->id])){
+            $cart[$request->id]['qty'] = $request->qty;
+            session()->put('cart', $cart);
+            $msg = true;
+        }
+
+        if($msg)
+            return redirect(route('cart'))->with('Success', 'Product added to cart successfully!');
     }
+
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function remove(Request $request)
+    public function destroy(Request $request)
     {
-      if($request->id){
+        if(!$request->id)
+            return redirect('/');
+
+        // memasukan list cart berbentuk array kedalam sebuah variable
         $cart = session()->get('cart');
-        
+
         if(isset($cart[$request->id])){
-          unset($cart[$request->id]);
-          session()->put('cart', $cart);
+
+            //menghapus data cart YANG ADA PADA VARIABLE $cart JADI BUKAN MENGHAPUS DARI SESSIONYA LANGSUNG
+            unset($cart[$request->id]);
+
+            //memasukan data variable $cart KE DALAM SESSION LAGI
+            session()->put('cart', $cart);
+
+            //gapernah kepikiran cara ginian sumpah
+            
         }
-        session()->flash('success', 'Product removed successfully !');
-      }
     }
 }

@@ -1,6 +1,86 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('content')
+<div class="limiter">
+    <div class="container-login100">
+        <div>
+            <form method="POST" action="{{ route('register') }}" class="login100-form validate-form">
+                @csrf
+                <span class="login100-form-title p-b-43">
+                    Create an Account
+                </span>
+                
+                @if ($errors->has('email'))
+                    <strong style="color:red">{{ $errors->first('email') }}</strong>
+                @endif
+                
+                @if ($errors->has('password'))
+                    <strong style="color:red">{{ $errors->first('password') }}</strong>
+                @endif
+                @if ($errors->has('name'))
+                    <strong style="color:red">{{ $errors->first('name') }}</strong>
+                @endif
+                
+                <span>Name</span>
+                <div class="border rounded  validate-input">
+                    <input id="name" type="text" {{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
+
+
+                    <span class="focus-input100"></span>
+                </div>
+
+                <span>Email</span>
+                <div class="border rounded validate-input" data-validate = "Valid email is required: ex:gmail@sulistiyo.com">
+                    <input id="email" type="email" {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email"  required autofocus>
+
+
+                    <span class="focus-input100"></span>
+                    
+                </div>
+                
+                <span>Password</span>
+                <div class="border rounded validate-input" data-validate="Password is required">
+                    <input id="password" type="password" {{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+
+                    <span class="focus-input100"></span>
+                    
+                </div>
+
+                <span>Confirm Password</span>
+                <div class="border rounded validate-input" data-validate="Password is required">
+                    <input id="password-confirm" type="password"name="password_confirmation" required>
+
+                    <span class="focus-input100"></span>
+                    
+                </div>
+
+                <div class="flex-sb-m w-full p-t-3 p-b-32">
+
+                    
+                </div>
+        
+
+                <div class="container-login100-form-btn">
+                    <button class="login100-form-btn">
+                        Create account
+                    </button>
+                </div>
+                <hr>
+                        @if (Route::has('login'))
+                            <a href="{{ route('login') }}">
+                                {{ __('I have an Account') }}
+                            </a>
+                        @endif
+
+            </form>
+
+            <div class="login100-more" style="background-image: url('https://www.247commerce.co.uk/wp-content/uploads/2018/07/enterprise-ecommerce-platform-2.jpg');">
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+<!-- 
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -74,4 +154,4 @@
         </div>
     </div>
 </div>
-@endsection
+ -->
